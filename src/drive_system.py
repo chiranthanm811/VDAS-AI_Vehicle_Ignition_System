@@ -11,6 +11,12 @@ Flow:
   6. Relay ON → engine starts. Drive session logged.
 """
 
+import sys
+from pathlib import Path
+
+# Ensure local module directory is in sys.path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 import cv2
 import face_recognition
 import numpy as np

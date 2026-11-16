@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\architecture\\candidate.json",
+    "sha256": "f3a9e356bd316219dc5f43d33ace83ce333002234bbef0df069a6a872e76333c",
+    "bytes": 5899
+  },
+  "artifact": {
+    "path": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\architecture\\vdas-architecture.html",
+    "sha256": "31869e74871c61e747c4212f60d6b855a91aa456f387a96580db0fb547002af6",
+    "bytes": 862296
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\architecture\\vdas-architecture.finalize.json",
+    "summaryReceipt": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\architecture\\vdas-architecture.finalize-summary.json",
+    "browserCheckReceipt": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\architecture\\vdas-architecture.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-16T14:29:53.300Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 3198,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

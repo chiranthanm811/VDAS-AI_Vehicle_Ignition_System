@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "VDAS - Biometric Verification & Ignition Lifecycle Workflow",
+    "visual_preset": "signal-flow",
+    "quality_profile": "showcase",
+    "output": "docs/workflow/vdas-workflow.html"
+  },
+  "lanes": [
+    { "id": "driver", "label": "Driver Actions" },
+    { "id": "esp32", "label": "ESP32 Hardware & IO" },
+    { "id": "vision", "label": "Vision Pipeline (Laptop)" },
+    { "id": "security", "label": "Security Gating & DB" }
+  ],
+  "phases": [
+    { "id": "presence", "label": "1. Seat Telemetry", "fromCol": 0, "toCol": 1 },
+    { "id": "depth", "label": "2. 3D Stereo Depth", "fromCol": 2, "toCol": 2, "variant": "emphasis" },
+    { "id": "liveness", "label": "3. Identity & Blink", "fromCol": 3, "toCol": 4, "variant": "security" },
+    { "id": "ignition", "label": "4. Ignition Execution", "fromCol": 5, "toCol": 5, "variant": "emphasis" }
+  ],
+  "mainPath": [
+    "drv_sit",
+    "fsr_sense",
+    "serial_seat",
+    "arm_cams",
+    "capture_pair",
+    "stereo_depth",
+    "face_id",
+    "ear_track",
+    "blink_fsm",
+    "send_unlock",
+    "lic_check",
+    "ign_active"
+  ],
+  "nodes": [
+    { "id": "drv_sit", "lane": "driver", "col": 0, "type": "external", "label": "Driver Sits", "sublabel": "physical contact", "width": 128 },
+    { "id": "fsr_sense", "lane": "esp32", "col": 0, "type": "security", "label": "FSR Sensing", "sublabel": "GPIO34 > 300", "tag": "Hardware Gate", "width": 128 },
+    { "id": "serial_seat", "lane": "esp32", "col": 1, "type": "messagebus", "label": "Send SEAT:1", "sublabel": "UART 115200 baud", "width": 128 },
+    { "id": "arm_cams", "lane": "vision", "col": 1, "type": "backend", "label": "Start Cameras", "sublabel": "Cam 0 & Cam 1", "tag": "DirectShow", "width": 128 },
+    { "id": "capture_pair", "lane": "vision", "col": 2, "type": "backend", "label": "Stereo Frames", "sublabel": "synchronous grab", "width": 128 },
+    { "id": "stereo_depth", "lane": "security", "col": 2, "type": "security", "label": "Stereo Depth", "sublabel": "nose-tip disparity", "tag": ">= 3.2% required", "width": 128 },
+    { "id": "spoof_trap", "lane": "esp32", "col": 2, "type": "security", "label": "Photo Spoof Block", "sublabel": "buzzer alarm + deny", "tag": "Depth < 3.2%", "width": 128 },
+    { "id": "face_id", "lane": "security", "col": 3, "type": "backend", "label": "Face Recognition", "sublabel": "128D match d<=0.56", "tag": "RTO & Local", "width": 128 },
+    { "id": "ear_track", "lane": "vision", "col": 3, "type": "backend", "label": "Eye Landmarks", "sublabel": "EAR computation", "tag": "cyan dots", "width": 128 },
+    { "id": "blink_fsm", "lane": "security", "col": 4, "type": "security", "label": "Blink State Machine", "sublabel": "1-6 frame closure", "tag": "drop >= 25%", "width": 128 },
+    { "id": "send_unlock", "lane": "vision", "col": 4, "type": "backend", "label": "Send U:Name", "sublabel": "heartbeat packet", "tag": "serial protocol", "width": 128 },
+    { "id": "lic_check", "lane": "security", "col": 5, "type": "database", "label": "Licence Validity", "sublabel": "valid & not blocked", "tag": "check_licence()", "width": 128 },
+    { "id": "ign_active", "lane": "esp32", "col": 5, "type": "backend", "label": "Ignition Active", "sublabel": "Relay ON + Chime", "tag": "GPIO25 LOW", "width": 128 },
+    { "id": "unseat", "lane": "driver", "col": 5, "type": "external", "label": "Driver Vacates", "sublabel": "instant lock", "width": 128 }
+  ],
+  "edges": [
+    { "id": "e-sit", "from": "drv_sit", "to": "fsr_sense", "label": "weight" },
+    { "id": "e-fsr-uart", "from": "fsr_sense", "to": "serial_seat", "label": "analog >= 300" },
+    { "id": "e-uart-cam", "from": "serial_seat", "to": "arm_cams", "label": "open cams" },
+    { "id": "e-cam-cap", "from": "arm_cams", "to": "capture_pair" },
+    { "id": "e-cap-depth", "from": "capture_pair", "to": "stereo_depth", "label": "landmarks", "variant": "emphasis" },
+    { "id": "e-depth-spoof", "from": "stereo_depth", "to": "spoof_trap", "label": "< 3.2% flat", "variant": "security", "role": "error" },
+    { "id": "e-depth-face", "from": "stereo_depth", "to": "face_id", "label": ">= 3.2% real", "variant": "emphasis" },
+    { "id": "e-face-ear", "from": "face_id", "to": "ear_track", "label": "driver found", "variant": "emphasis" },
+    { "id": "e-ear-fsm", "from": "ear_track", "to": "blink_fsm", "label": "stream EAR" },
+    { "id": "e-fsm-send", "from": "blink_fsm", "to": "send_unlock", "label": "blink verified", "variant": "emphasis" },
+    { "id": "e-send-lic", "from": "send_unlock", "to": "lic_check", "label": "verify DL", "variant": "emphasis" },
+    { "id": "e-lic-ign", "from": "lic_check", "to": "ign_active", "label": "U:packet", "variant": "emphasis" },
+    { "id": "e-ign-unseat", "from": "ign_active", "to": "unseat", "label": "unseat lock", "variant": "dashed" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Continuous Anti-Spoof Guard (Implemented)",
+      "items": [
+        "Stereo disparity computed continuously until ignition unlocks",
+        "Flat displays and printed photos remain locked below 3.2% threshold",
+        "Attempts trigger urgent 3-pulse buzzer warning and are logged to SQLite"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Natural Blink Liveness (Implemented)",
+      "items": [
+        "4 baseline open frames establish individualized normal EAR",
+        "State machine accepts 1 to 6 frame closures (80-250ms natural blink)",
+        "Immune to single-frame camera jitter and static paper/phone photos"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Roadmap Architecture (Proposed)",
+      "items": [
+        "MQ-3 alcohol detection gating before biometric scan initiates",
+        "Continuous drowsiness & head pose estimation during active driving",
+        "Cloud sync for cross-vehicle blacklists and remote telemetry"
+      ]
+    }
+  ]
+}

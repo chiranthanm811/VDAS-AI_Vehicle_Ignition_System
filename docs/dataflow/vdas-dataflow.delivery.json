@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "96c1a16f-2cec-4b58-bfba-01c71b737496",
+  "status": "current",
+  "command": "deliver",
+  "type": "dataflow",
+  "input": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\dataflow\\candidate.json",
+  "output": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\dataflow\\vdas-dataflow.html",
+  "specification": {
+    "sha256": "57d20bdf36da8aea7e901a3661fc6d183ccde6e6c0a556aba808a06bddae9e39",
+    "bytes": 5685
+  },
+  "artifact": {
+    "sha256": "c50f0325f658943469d4d1f330328ea944185e23171ab4cfcb8a5c481923d021",
+    "bytes": 854739
+  }
+}

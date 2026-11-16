@@ -3,6 +3,13 @@
 Run this once to put people's faces into the (simulated) official RTO licence database.
 Every licence record can hold one face. The vehicle later finds the licence by the face.
 """
+import os
+import sys
+from pathlib import Path
+
+# Ensure src/ is on sys.path for core module imports
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+
 import cv2
 import face_recognition
 import numpy as np

@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "VDAS - End-to-End Telemetry & Security Data Flow",
+    "output": "docs/dataflow/vdas-dataflow.html",
+    "quality_profile": "showcase"
+  },
+  "stages": [
+    { "label": "1. Acquisition" },
+    { "label": "2. Extraction" },
+    { "label": "3. Verification" },
+    { "label": "4. Persistence" },
+    { "label": "5. Actuation & UI" }
+  ],
+  "nodes": [
+    { "id": "raw_cams", "type": "cloud", "label": "Dual Webcams", "sublabel": "Cam 0 & 1 (640x480)", "stage": 0, "row": 0, "tag": "DirectShow" },
+    { "id": "fsr_sensor", "type": "security", "label": "FSR Seat Sensor", "sublabel": "GPIO34 Analog", "stage": 0, "row": 2, "tag": "Presence" },
+    { "id": "depth_extractor", "type": "backend", "label": "Depth Extractor", "sublabel": "Nose-tip disparity", "stage": 1, "row": 0, "tag": "Affine fit" },
+    { "id": "landmark_extractor", "type": "backend", "label": "Facial Landmarks", "sublabel": "68-point coordinates", "stage": 1, "row": 1, "tag": "dlib model" },
+    { "id": "ear_calculator", "type": "backend", "label": "EAR Calculator", "sublabel": "Eyelid aspect ratio", "stage": 1, "row": 2, "tag": "Eye vectors" },
+    { "id": "depth_gate", "type": "security", "label": "3D Depth Gate", "sublabel": "Disparity >= 3.2%", "stage": 2, "row": 0, "tag": "Anti-Spoof" },
+    { "id": "face_embedder", "type": "backend", "label": "Face Recognizer", "sublabel": "128D Embedding", "stage": 2, "row": 1, "tag": "d <= 0.56" },
+    { "id": "blink_detector", "type": "security", "label": "Blink Detector", "sublabel": "4-State Machine", "stage": 2, "row": 2, "tag": "Liveness" },
+    { "id": "rto_db", "type": "database", "label": "RTO Authority", "sublabel": "rto_database.db", "stage": 3, "row": 0, "tag": "Official DL" },
+    { "id": "local_db", "type": "database", "label": "Local Cache DB", "sublabel": "vehicle_local.db", "stage": 3, "row": 1, "tag": "Sessions" },
+    { "id": "live_state", "type": "messagebus", "label": "Live Telemetry", "sublabel": "In-memory state", "stage": 3, "row": 2, "tag": "JSON state" },
+    { "id": "esp32_actuator", "type": "backend", "label": "ESP32 Controller", "sublabel": "Relay / Chime / LCD", "stage": 4, "row": 0, "tag": "GPIO IO" },
+    { "id": "dashboard_ui", "type": "frontend", "label": "Owner Dashboard", "sublabel": "Flask :5000 HUD", "stage": 4, "row": 1, "tag": "Web Audio" },
+    { "id": "mjpeg_stream", "type": "cloud", "label": "MJPEG Server", "sublabel": "Port 5001 Stream", "stage": 4, "row": 2, "tag": "Video Feed" }
+  ],
+  "flows": [
+    { "id": "f-cams-depth", "from": "raw_cams", "to": "depth_extractor", "label": "stereo frames", "variant": "emphasis" },
+    { "id": "f-cams-lm", "from": "raw_cams", "to": "landmark_extractor", "label": "main frame", "variant": "default" },
+    { "id": "f-lm-ear", "from": "landmark_extractor", "to": "ear_calculator", "label": "eye points", "variant": "default" },
+    { "id": "f-depth-gate", "from": "depth_extractor", "to": "depth_gate", "label": "residual score", "variant": "security" },
+    { "id": "f-lm-embed", "from": "landmark_extractor", "to": "face_embedder", "label": "face box", "variant": "emphasis" },
+    { "id": "f-gate-embed", "from": "depth_gate", "to": "face_embedder", "label": "depth passed", "variant": "security" },
+    { "id": "f-embed-rto", "from": "face_embedder", "to": "rto_db", "label": "RTO query", "variant": "default" },
+    { "id": "f-embed-local", "from": "face_embedder", "to": "local_db", "label": "cache query", "variant": "default" },
+    { "id": "f-ear-blink", "from": "ear_calculator", "to": "blink_detector", "label": "stream EAR", "variant": "emphasis" },
+    { "id": "f-embed-blink", "from": "face_embedder", "to": "blink_detector", "label": "driver found", "variant": "emphasis" },
+    { "id": "f-blink-live", "from": "blink_detector", "to": "live_state", "label": "blink confirmed", "variant": "security" },
+    { "id": "f-fsr-live", "from": "fsr_sensor", "to": "live_state", "label": "SEAT:1 / 0", "variant": "security" },
+    { "id": "f-live-esp", "from": "live_state", "to": "esp32_actuator", "label": "U/W/D packets", "variant": "security" },
+    { "id": "f-live-db", "from": "live_state", "to": "local_db", "label": "audit log", "variant": "default" },
+    { "id": "f-live-dash", "from": "live_state", "to": "dashboard_ui", "label": "state polling", "variant": "emphasis" },
+    { "id": "f-cams-stream", "from": "raw_cams", "to": "mjpeg_stream", "label": "HUD frames", "variant": "default" },
+    { "id": "f-stream-dash", "from": "mjpeg_stream", "to": "dashboard_ui", "label": "proxy video", "variant": "default" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Strict Gating Chain (Implemented)",
+      "items": [
+        "FSR sensor gates camera initialization on driver entry",
+        "3D depth residual must pass >=3.2% before face matching executes",
+        "Blink state machine requires verified closure before relay triggers"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Dual-Database Hierarchy (Implemented)",
+      "items": [
+        "Local vehicle database provides sub-millisecond offline cache matching",
+        "RTO official database acts as primary authority for licence validity",
+        "All security events, denials, and durations are persisted to SQLite"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Extended Telemetry Channels (Proposed)",
+      "items": [
+        "MQ-3 alcohol gas level streaming to live state engine",
+        "PERCLOS eye closure percentage logged over continuous driving intervals",
+        "Cellular MQTT uplink forwarding tamper events to emergency contacts"
+      ]
+    }
+  ]
+}

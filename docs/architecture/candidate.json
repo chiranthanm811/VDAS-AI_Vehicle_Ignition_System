@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "VDAS - Vehicle Driver Authentication & Ignition System Architecture",
+    "output": "docs/architecture/vdas-architecture.html",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    { "id": "driver", "type": "external", "label": "Driver", "sublabel": "Physical Person", "pos": [40, 240], "size": [110, 60] },
+    { "id": "fsr", "type": "security", "label": "FSR Seat Sensor", "sublabel": "GPIO34 Analog", "pos": [250, 60], "size": [140, 60], "tag": "Threshold 300" },
+    { "id": "esp32", "type": "backend", "label": "ESP32 Controller", "sublabel": "Firmware v2.5", "pos": [480, 60], "size": [150, 60], "tag": "COM4 115200" },
+    { "id": "relay", "type": "security", "label": "Ignition Relay", "sublabel": "GPIO25 Active-LOW", "pos": [710, 60], "size": [140, 60], "tag": "GPIO26 LED" },
+    { "id": "feedback", "type": "backend", "label": "Audio & Visuals", "sublabel": "GPIO13 Buzzer / 27 PWM", "pos": [930, 60], "size": [140, 60], "tag": "LCD 1602" },
+    { "id": "cams", "type": "cloud", "label": "Dual Webcams", "sublabel": "Indices 0 & 1", "pos": [250, 240], "size": [140, 60], "tag": "640x480 MJPG" },
+    { "id": "vision", "type": "backend", "label": "Vision Pipeline", "sublabel": "drive_system.py", "pos": [480, 240], "size": [150, 60], "tag": "OpenCV HUD" },
+    { "id": "liveness", "type": "security", "label": "Liveness Engine", "sublabel": "Depth >=3.2% & EAR", "pos": [710, 240], "size": [140, 60], "tag": "Anti-Spoof" },
+    { "id": "matcher", "type": "backend", "label": "Identity Matcher", "sublabel": "core.py d<=0.56", "pos": [930, 240], "size": [140, 60], "tag": "128D Vector" },
+    { "id": "db_rto", "type": "database", "label": "RTO Database", "sublabel": "rto_database.db", "pos": [1150, 240], "size": [140, 60], "tag": "Official DL" },
+    { "id": "dashboard", "type": "frontend", "label": "Web Dashboard", "sublabel": "dashboard.py :5000", "pos": [250, 420], "size": [140, 60], "tag": "Web Audio" },
+    { "id": "stream", "type": "cloud", "label": "MJPEG Server", "sublabel": "Port 5001", "pos": [480, 420], "size": [150, 60], "tag": "HTTP Live" },
+    { "id": "db_local", "type": "database", "label": "Local Database", "sublabel": "vehicle_local.db", "pos": [710, 420], "size": [140, 60], "tag": "SQLite Cache" },
+    { "id": "owner", "type": "external", "label": "Vehicle Owner", "sublabel": "Browser / Kiosk", "pos": [40, 420], "size": [110, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Vehicle Hardware Enclosure", "wraps": ["fsr", "esp32", "relay", "feedback"] },
+    { "kind": "security-group", "label": "Edge Compute Subsystem", "wraps": ["cams", "vision", "liveness", "matcher", "stream", "dashboard", "db_local"] }
+  ],
+  "connections": [
+    { "id": "drv-fsr", "from": "driver", "to": "fsr", "label": "sits on seat", "fromSide": "top", "toSide": "left" },
+    { "id": "fsr-esp", "from": "fsr", "to": "esp32", "label": "FSR analog", "fromSide": "right", "toSide": "left" },
+    { "id": "esp-telemetry", "from": "esp32", "to": "vision", "label": "SEAT:1/0", "fromSide": "bottom", "toSide": "top" },
+    { "id": "drv-cam", "from": "driver", "to": "cams", "label": "face pose" },
+    { "id": "cam-vis", "from": "cams", "to": "vision", "label": "stereo frames" },
+    { "id": "vis-live", "from": "vision", "to": "liveness", "label": "landmarks", "variant": "emphasis" },
+    { "id": "live-mat", "from": "liveness", "to": "matcher", "label": "depth ok", "variant": "emphasis" },
+    { "id": "mat-local", "from": "matcher", "to": "db_local", "label": "query cache", "fromSide": "bottom", "toSide": "right" },
+    { "id": "mat-rto", "from": "matcher", "to": "db_rto", "label": "verify RTO", "fromSide": "right", "toSide": "left" },
+    { "id": "vis-esp", "from": "vision", "to": "esp32", "label": "U / W / D / L", "variant": "security", "fromSide": "top", "toSide": "bottom" },
+    { "id": "esp-relay", "from": "esp32", "to": "relay", "label": "relay LOW (ON)", "variant": "emphasis", "fromSide": "right", "toSide": "left" },
+    { "id": "esp-feed", "from": "relay", "to": "feedback", "label": "chime / PWM", "fromSide": "right", "toSide": "left" },
+    { "id": "vis-stream", "from": "vision", "to": "stream", "label": "HUD stream", "fromSide": "bottom", "toSide": "top" },
+    { "id": "dash-stream", "from": "dashboard", "to": "stream", "label": "proxy feed", "fromSide": "right", "toSide": "left" },
+    { "id": "dash-db", "from": "dashboard", "to": "db_local", "label": "sync events", "fromSide": "bottom", "toSide": "bottom", "via": [[320, 510], [780, 510]] },
+    { "id": "own-dash", "from": "owner", "to": "dashboard", "label": "audit / lock", "fromSide": "right", "toSide": "left" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Hardware Enforcement (Implemented)",
+      "items": [
+        "GPIO34 FSR seat sensor enforces driver presence before vision pipeline arms",
+        "GPIO25 Active-LOW relay directly controls vehicle starter/ignition circuit",
+        "Hardware watchdog locks relay if laptop heartbeat halts for > 3.5 seconds",
+        "LiquidCrystal_I2C 1602 display with custom 5x8 graphics & marquee scrolling"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Dual-Camera Anti-Spoofing (Implemented)",
+      "items": [
+        "Stereo cameras 0 and 1 measure 3D nose-tip disparity against facial contour",
+        "Photo and screen spoofs (<3.2% depth) are rejected and logged to events",
+        "4-state EAR state machine validates natural human eye blinks"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Roadmap & Future Extensions (Proposed)",
+      "items": [
+        "MQ-3 alcohol detection sensor interface on ESP32 analog ADC",
+        "PERCLOS driver fatigue & continuous drowsiness monitoring",
+        "GPS location telemetry logging and cellular SOS alert dispatch"
+      ]
+    }
+  ]
+}

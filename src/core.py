@@ -8,11 +8,16 @@ Two databases:
 import sqlite3
 import time
 from datetime import date
+from pathlib import Path
 
 import numpy as np
 
-RTO_DB = "rto_database.db"
-LOCAL_DB = "vehicle_local.db"
+# Base paths for persistent data storage
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = BASE_DIR / "data"
+
+RTO_DB = str(DATA_DIR / "rto_database.db")
+LOCAL_DB = str(DATA_DIR / "vehicle_local.db")
 VEHICLE_CLASS = "LMV"        # this vehicle is a four-wheeler
 MATCH_TOLERANCE = 0.56       # calibrated for reliable live face recognition (0.60 is dlib default)
 

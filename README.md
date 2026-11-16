@@ -120,14 +120,14 @@ pip install -r requirements.txt
 ```
 
 ### 3. Flash ESP32 Firmware
-1. Open [`ignition_esp32/ignition_esp32.ino`](ignition_esp32/ignition_esp32.ino) in the **Arduino IDE**.
+1. Open [`firmware/ignition_esp32/ignition_esp32.ino`](firmware/ignition_esp32/ignition_esp32.ino) in the **Arduino IDE**.
 2. Select Board: **ESP32 Dev Module**, Port: `COM4` (or your platform's serial port).
 3. Install the **LiquidCrystal_I2C** library if not already present.
 4. Click **Upload**.
 
 ### 4. Seed the RTO Database
 ```bash
-python rto_setup.py
+python tools/rto_setup.py
 ```
 
 ### 5. Launch System
@@ -135,12 +135,12 @@ Open two terminals:
 
 **Terminal 1 (Vision & Ignition Engine):**
 ```bash
-python drive_system.py
+python src/drive_system.py
 ```
 
 **Terminal 2 (Web Dashboard):**
 ```bash
-python dashboard.py
+python src/dashboard.py
 ```
 Access the dashboard at `http://127.0.0.1:5000`.
 
@@ -149,19 +149,40 @@ Access the dashboard at `http://127.0.0.1:5000`.
 ## 📁 Repository Structure
 
 ```
-├── drive_system.py          # Main vision pipeline (stereo depth, blink, face match)
-├── dashboard.py             # Flask dashboard, cyberpunk HUD, Web Audio synth
-├── core.py                  # Database queries, identity cache, licence validator
-├── rto_setup.py             # RTO database enrolment CLI tool
-├── depth_test.py            # Stereo camera calibration utility
-├── depth_debug.py           # Depth measurement visual debugger
-├── find_camera.py           # USB camera index discovery utility
-├── rto_database.db          # Simulated official government RTO database
-├── vehicle_local.db         # Fast local vehicle cache database
-├── requirements.txt         # Python package dependencies
-├── .gitignore               # Git ignore rules
-└── ignition_esp32/
-    └── ignition_esp32.ino   # ESP32 production firmware v2.5
+VDAS-AI-Vehicle-Ignition-System/
+├── src/                               # Core Application Source Code
+│   ├── core.py                        # Central database & business logic layer
+│   ├── drive_system.py                # Main runtime: Dual-camera stereo vision & ESP32 driver
+│   └── dashboard.py                   # Flask web dashboard & telemetry streaming
+│
+├── firmware/                          # Microcontroller Firmware
+│   └── ignition_esp32/
+│       └── ignition_esp32.ino         # ESP32 dual-core firmware v2.5
+│
+├── tools/                             # Calibration & Administrative Utilities
+│   ├── rto_setup.py                   # RTO database administrator & driver enrollment CLI
+│   ├── depth_debug.py                 # Advanced stereo depth calibration & diagnostics tool
+│   ├── depth_test.py                  # Stereo baseline verification tool
+│   └── find_camera.py                 # USB camera enumeration & index discovery utility
+│
+├── data/                              # Databases & Storage
+│   ├── vehicle_local.db               # Vehicle edge cache (authorized drivers, sessions, events)
+│   └── rto_database.db                # Authoritative simulated RTO license database
+│
+├── docs/                              # System Documentation & Archify Visualizations
+│   ├── architecture/                  # Interactive System Architecture Diagram
+│   ├── workflow/                      # Interactive Verification Workflow Diagram
+│   ├── dataflow/                      # Interactive Telemetry Dataflow Diagram
+│   └── explainer/                     # One-Page Technical Explainer
+│
+├── prototypes/                        # Early Research & Proof-of-Concept Scripts
+│   ├── face_detect.py                 # Single-camera face detection demo
+│   ├── face_recognize.py              # Standalone face recognition test
+│   └── face_liveness.py               # Single-camera eye-blink detection prototype
+│
+├── .gitignore                         # Git ignore patterns
+├── requirements.txt                   # Python package dependencies
+└── README.md                          # Repository documentation & guide
 ```
 
 ---

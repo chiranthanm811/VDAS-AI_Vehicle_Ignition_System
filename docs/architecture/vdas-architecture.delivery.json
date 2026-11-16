@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "20637bb5-ea52-4167-8e8e-7be8a138b167",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\architecture\\candidate.json",
+  "output": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\architecture\\vdas-architecture.html",
+  "specification": {
+    "sha256": "f3a9e356bd316219dc5f43d33ace83ce333002234bbef0df069a6a872e76333c",
+    "bytes": 5899
+  },
+  "artifact": {
+    "sha256": "31869e74871c61e747c4212f60d6b855a91aa456f387a96580db0fb547002af6",
+    "bytes": 862296
+  }
+}

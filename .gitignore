@@ -2,15 +2,25 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*/__pycache__/
+*/*/__pycache__/
 
 # SQLite journal and temporary files
 *.db-shm
 *.db-wal
 *.db-journal
+**/*.db-shm
+**/*.db-wal
+**/*.db-journal
 
-# Temporary test frame dumps
+# Archify CLI cache
+.archify/
+**/.archify/
+
+# Temporary test frame dumps & scratch files
 msmf_*_test.jpg
 test_*.jpg
+*.npy
 
 # Environments
 .env

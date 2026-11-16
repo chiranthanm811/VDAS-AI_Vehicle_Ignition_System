@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "5ce3f780-3e8f-49b1-b58b-b02bd631f3e5",
+  "status": "current",
+  "command": "deliver",
+  "type": "explainer",
+  "input": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\explainer\\candidate.archify.md",
+  "output": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\explainer\\vdas-explainer.html",
+  "specification": {
+    "sha256": "632e5b01921246e171b5cf4451cf3fe88b633b65579f9b28d8102e7997b5dcf0",
+    "bytes": 4669
+  },
+  "artifact": {
+    "sha256": "c8666c1420612049e60979cd8e7b63bb5ac592fbb3395698bb5aaa0bc2a0b5d1",
+    "bytes": 543897
+  },
+  "explainer": {
+    "preparedSha256": "f927f9218420944d9e7352b3668167f8b0d6cc98029772eb53cf482b1c362085",
+    "dependencies": [
+      {
+        "kind": "diagram-spec",
+        "id": "auth-seq",
+        "inline": true,
+        "sha256": "50b1279f303163ecc7a8a14e99f5963cecad698434d1c9697a4e7c66ed5c7e23",
+        "bytes": 1223
+      }
+    ]
+  }
+}

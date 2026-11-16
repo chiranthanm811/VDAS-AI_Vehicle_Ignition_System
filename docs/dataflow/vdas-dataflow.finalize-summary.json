@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "dataflow",
+  "quality": "showcase",
+  "specification": {
+    "path": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\dataflow\\candidate.json",
+    "sha256": "57d20bdf36da8aea7e901a3661fc6d183ccde6e6c0a556aba808a06bddae9e39",
+    "bytes": 5685
+  },
+  "artifact": {
+    "path": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\dataflow\\vdas-dataflow.html",
+    "sha256": "c50f0325f658943469d4d1f330328ea944185e23171ab4cfcb8a5c481923d021",
+    "bytes": 854739
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\dataflow\\vdas-dataflow.finalize.json",
+    "summaryReceipt": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\dataflow\\vdas-dataflow.finalize-summary.json",
+    "browserCheckReceipt": "C:\\Users\\ChiranthanM\\Desktop\\Projects\\Mini_Project\\docs\\dataflow\\vdas-dataflow.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-16T14:29:53.300Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 2958,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  },
+  "visualReviewRecommendation": {
+    "action": "inspect-route-readability",
+    "signals": {
+      "resolvedCrossovers": 2,
+      "routesOverSuggestedBends": 2,
+      "routesOverSuggestedStretch": 1
+    },
+    "reason": "Automated gates passed, but crossings or detours still need perceptual review before claiming visual quality.",
+    "affectedRoutes": {
+      "crossings": [
+        {
+          "left": {
+            "id": "f-lm-ear",
+            "from": "landmark_extractor",
+            "to": "ear_calculator",
+            "label": "eye points",
+            "collectionIndex": 2,
+            "artifactIndex": 3
+          },
+          "right": {
+            "id": "f-fsr-live",
+            "from": "fsr_sensor",
+            "to": "live_state",
+            "label": "SEAT:1 / 0",
+            "collectionIndex": 11,
+            "artifactIndex": 12
+          },
+          "point": [
+            315,
+            341
+          ]
+        },
+        {
+          "left": {
+            "id": "f-embed-blink",
+            "from": "face_embedder",
+            "to": "blink_detector",
+            "label": "driver found",
+            "collectionIndex": 9,
+            "artifactIndex": 10
+          },
+          "right": {
+            "id": "f-fsr-live",
+            "from": "fsr_sensor",
+            "to": "live_state",
+            "label": "SEAT:1 / 0",
+            "collectionIndex": 11,
+            "artifactIndex": 12
+          },
+          "point": [
+            530,
+            341
+          ]
+        }
+      ],
+      "detours": [
+        {
+          "relationship": {
+            "id": "f-fsr-live",
+            "from": "fsr_sensor",
+            "to": "live_state",
+            "label": "SEAT:1 / 0",
+            "collectionIndex": 11,
+            "artifactIndex": 12
+          },
+          "bends": 4,
+          "stretch": 1.162,
+          "directCorridorBlockers": [
+            {
+              "id": "ear_calculator",
+              "label": "EAR Calculator",
+              "box": [
+                259,
+                356,
+                112,
+                58
+              ]
+            },
+            {
+              "id": "blink_detector",
+              "label": "Blink Detector",
+              "box": [
+                474,
+                356,
+                112,
+                58
+              ]
+            }
+          ]
+        },
+        {
+          "relationship": {
+            "id": "f-cams-stream",
+            "from": "raw_cams",
+            "to": "mjpeg_stream",
+            "label": "HUD frames",
+            "collectionIndex": 15,
+            "artifactIndex": 16
+          },
+          "bends": 6,
+          "stretch": 1.405
+        }
+      ],
+      "truncated": false
+    },
+    "repair": "Advisory only: this mode places or routes these relationships itself. Report them; do not remove relationships or meaning to reduce crossings."
+  }
+}

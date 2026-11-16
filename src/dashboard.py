@@ -3,6 +3,12 @@ VeriDrive Owner Dashboard — dashboard.py
 Run: py -3.11 dashboard.py   then open http://127.0.0.1:5000
 """
 from flask import Flask, jsonify, Response
+import sys
+from pathlib import Path
+
+# Ensure local module directory is in sys.path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 import core, time, urllib.request, numpy as np, cv2
 
 app = Flask(__name__)
